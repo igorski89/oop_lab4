@@ -10,6 +10,7 @@
 #define SHAPE_H
 
 #include <QPainter>
+#include <string>
 
 class Shape {
 protected:
@@ -51,9 +52,10 @@ public:
     
     virtual void draw(QPainter *renderArea);
     virtual void setScale(float scalef);
+    virtual std::string toString();
     
     Shape();
-    Shape(float x, float y, float h, float w, float r, float g, float b);
+    Shape(float x, float y, float w, float h, int r, int g, int b);
     Shape(const Shape& shape);
     virtual ~Shape() { };
 

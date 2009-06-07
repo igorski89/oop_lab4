@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created: Fri Apr 24 01:28:06 2009
+** Created: Sat Apr 25 14:05:00 2009
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,20 +23,25 @@ static const uint qt_meta_data_MainWindow[] = {
        2,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       3,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
+
+ // slots: signature, parameters, type, tag, flags
+      12,   11,   11,   11, 0x08,
+      22,   11,   11,   11, 0x08,
+      29,   11,   11,   11, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_MainWindow[] = {
-    "MainWindow\0"
+    "MainWindow\0\0newFile()\0open()\0saveAs()\0"
 };
 
 const QMetaObject MainWindow::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_MainWindow,
+    { &QMainWindow::staticMetaObject, qt_meta_stringdata_MainWindow,
       qt_meta_data_MainWindow, 0 }
 };
 
@@ -50,14 +55,23 @@ void *MainWindow::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_MainWindow))
         return static_cast<void*>(const_cast< MainWindow*>(this));
-    return QWidget::qt_metacast(_clname);
+    return QMainWindow::qt_metacast(_clname);
 }
 
 int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QWidget::qt_metacall(_c, _id, _a);
+    _id = QMainWindow::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: newFile(); break;
+        case 1: open(); break;
+        case 2: saveAs(); break;
+        default: ;
+        }
+        _id -= 3;
+    }
     return _id;
 }
 QT_END_MOC_NAMESPACE

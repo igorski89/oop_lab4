@@ -10,6 +10,7 @@
 #define CIRCLE_H
 
 #include "shape.h"
+#include <string>
 
 class Circle: public Shape {
 protected:
@@ -30,7 +31,7 @@ public:
     
     virtual void draw(QPainter *renderArea);
     virtual void setScale(float scalef);
-    
+    virtual std::string toString();
     
     Circle& operator=(const Circle& circle);
     bool operator==(const Circle& circle) const;

@@ -13,16 +13,13 @@
 #include "rectangle.h"
 #include "circle.h"
 #include <vector>
+#include <string>
 
 class ShapeContainer: public Shape {
 protected:
     bool selected;
     std::vector<Shape*> shapes;
-//    float scaleFactor;
-public:
-//    float getScaleFactor() const;
-//    void setScaleFactor(float newScaleFactor);
-    
+public:    
     bool isSelected() const;
     void setSelected(bool selected);
     
@@ -44,6 +41,7 @@ public:
     virtual void setScale(float scalef);
     void move(float dx, float dy);
     virtual void recalculateBounds();
+    virtual std::string toString();
 };
 
 #endif

@@ -10,6 +10,7 @@
 #define RECTANGLE_H
 
 #include "shape.h"
+#include <string>
 
 class Rectangle: public Shape {
 public:
@@ -19,7 +20,8 @@ public:
     Rectangle(const Rectangle& rect) : Shape(rect) {};
 
     virtual void draw(QPainter *renderArea);
-    
+    virtual std::string toString();
+
     Rectangle& operator=(const Rectangle& rect);
     bool operator==(const Rectangle& rect) const;
 };

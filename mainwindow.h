@@ -2,16 +2,19 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <QMainWindow>
 #include "shape_container.h"
 #include <QKeyEvent>
 
 
-class MainWindow : public QWidget
+//class MainWindow : public QWidget
+class MainWindow: public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = 0);
+//    MainWindow(QWidget *parent = 0);
+    MainWindow();
     ~MainWindow();
 
 protected:
@@ -27,6 +30,12 @@ protected:
 
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
+
+private slots:
+    void newFile();
+    void open();
+    void saveAs();
 
 };
 

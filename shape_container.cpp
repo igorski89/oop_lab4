@@ -8,6 +8,7 @@
  */
 
 #include "shape_container.h"
+#include <sstream>
 
 ShapeContainer::ShapeContainer():Shape() {
     this->setSelected(false);
@@ -47,6 +48,17 @@ void ShapeContainer::setScale(float scalef) {
 
 bool ShapeContainer::isSelected() const {
     return this->selected;
+}
+
+std::string ShapeContainer::toString() {
+    std::stringstream str_s;
+    str_s << "ShapeContainer " << x << "," << y << "," << w << "," << h << "," << red << "," << green << "," << blue << std::endl;
+//    for (std::vector<Shape*>::iterator it=shapes.begin();it < shapes.back();it++)
+//        str_s << (*it)->toString().c_str();
+    int shapes_size = shapes.size();
+    for(int i=0; i<shapes_size; i++)
+        str_s << shapes[i]->toString();
+    return str_s.str();
 }
 
 void ShapeContainer::setSelected(bool selected) {

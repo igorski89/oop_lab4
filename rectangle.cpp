@@ -8,6 +8,7 @@
  */
 
 #include "rectangle.h"
+#include <sstream>
 
 void Rectangle::draw(QPainter *renderArea){
     if (this->isVisible()){
@@ -17,6 +18,12 @@ void Rectangle::draw(QPainter *renderArea){
         renderArea->setBrush(QBrush(curr_color,Qt::SolidPattern));
         renderArea->drawRect(getX(),getY(),getWidth(),getHeight());
     }
+}
+
+std::string Rectangle::toString() {
+    std::stringstream str_s;
+    str_s << "Rectangle " << x << "," << y << "," << w << "," << h << "," << red << "," << green << "," << blue << std::endl;
+    return str_s.str();
 }
 
 Rectangle& Rectangle::operator=(const Rectangle& rect) {

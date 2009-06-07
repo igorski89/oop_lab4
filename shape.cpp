@@ -8,6 +8,7 @@
  */
 
 #include "shape.h"
+#include <sstream>
 
 Shape::Shape(){
     this->setLocation(0, 0);
@@ -17,7 +18,7 @@ Shape::Shape(){
     this->setColor(0.0,0.0,0.0);
 }
 
-Shape::Shape(float x, float y, float w, float h, float r, float g, float b) {
+Shape::Shape(float x, float y, float w, float h, int r, int g, int b) {
     this->setLocation(x,y);
     this->setSize(w,h);
     this->setVisible(true);
@@ -68,6 +69,12 @@ void  Shape::setColor(int r, int g, int b) {
 }
 
 void Shape::draw(QPainter *renderArea) { };
+
+std::string Shape::toString() {
+    std::stringstream str_s;
+    str_s << "Shape " << x << "," << y << "," << w << "," << h << "," << red << "," << green << "," << blue << std::endl;
+    return str_s.str();
+}
 
 Shape& Shape::operator=(const Shape& shape) {
     this->setLocation(shape.getX(), shape.getY());

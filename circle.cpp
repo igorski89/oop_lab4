@@ -10,6 +10,7 @@
 #include "circle.h"
 //#include <GLUT/GLUT.h>
 #include <math.h>
+#include <sstream>
 
 Circle::Circle(){
     this->setLocation(0, 0);
@@ -62,6 +63,12 @@ void Circle::draw(QPainter *renderArea) {
         renderArea->setBrush(QBrush(curr_color,Qt::SolidPattern));
         renderArea->drawEllipse(QPointF(getX(),getY()),radius,radius);
     }
+}
+
+std::string Circle::toString() {
+    std::stringstream str_s;
+    str_s << "Circle " << x << "," << y << "," << radius << "," << red << "," << green << "," << blue << std::endl;
+    return str_s.str();
 }
 
 Circle& Circle::operator=(const Circle& circle) {

@@ -1,15 +1,43 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QAction>
+#include <QMenu>
+#include <iostream>
+#include <QFileDialog>
+#include <QString>
+#include <fstream>
+#include <QFile>
+#include <QStringList>
 
-MainWindow::MainWindow(QWidget *parent):QWidget(parent)
-{
+//MainWindow::MainWindow(QWidget *parent):QWidget(parent)
+MainWindow::MainWindow() {
     this->resize(640,480);
 
-    ShapeContainer *cont = new ShapeContainer();
-    cont->addCircle(150,150,75,100,122,122);
-    cont->setSelected(true);
-    this->shapeContainers.push_back(cont);
-    this->setCurrentContainer(cont);
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+
+    QAction *newFileAction = new QAction(tr("&New"),this);
+    newFileAction->setShortcuts(QKeySequence::New);
+    connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFile()));
+    fileMenu->addAction(newFileAction);
+
+    QAction *openAction = new QAction(tr("&Open"),this);
+    openAction->setShortcuts(QKeySequence::Open);
+//    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+    fileMenu->addAction(openAction);
+
+    QAction *saveAsAction = new QAction(tr("&Save As..."),this);
+    saveAsAction->setShortcuts(QKeySequence::SaveAs);
+    connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAs()));
+    fileMenu->addAction(saveAsAction);
+
+
+
+//    ShapeContainer *cont = new ShapeContainer();
+//    cont->addCircle(150,150,75,100,122,122);
+//    cont->setSelected(true);
+//    this->shapeContainers.push_back(cont);
+//    this->setCurrentContainer(cont);
 }
 
 MainWindow::~MainWindow()
@@ -18,16 +46,107 @@ MainWindow::~MainWindow()
 //    delete currShape;
 }
 
+void MainWindow::newFile() {
+    for(unsigned int i = 0; i < shapeContainers.size(); i++) {
+        shapeContainers[i]->eraseAll();
+        delete shapeContainers[i];
+    }
+    shapeContainers.clear();
+    setCurrentContainer(NULL);
+    repaint();
+}
+
+void MainWindow::open() {
+//    std::cout << "opening file " << std::endl;
+     QFileDialog::Options options;
+     QString selectedFilter;
+     QString fileName = QFileDialog::getOpenFileName(this,
+                                 tr("open file"),
+                                 QString(""),
+                                 tr("All Files (*);;Text Files (*.txt)"),
+                                 &selectedFilter,
+                                 options);
+     if (!fileName.isEmpty()) {
+         std::ifstream data(fileName.toStdString().c_str(), std::ios_base::in);
+         while(!data.eof()){
+             bool ok;
+             std::string line;
+             std::getline(data,line);
+//             std::cout << "line = " << line << std::endl;
+             if (line == "") continue;
+             std::cout << "ShapeContainer" << std::endl;
+             ShapeContainer *cont = new ShapeContainer();
+             QStringList cont_list = QString(line.c_str()).split(" ");
+             QStringList cont_par = cont_list[1].split(",");
+             cont->setLocation(cont_par.at(0).toFloat(),cont_par.at(1).toFloat());
+             cont->setColor(cont_par.at(4).toInt(&ok,10),cont_par.at(5).toInt(&ok,10),cont_par.at(6).toInt(&ok,10));
+             cont->setSelected(true);
+             while( line != "***") {
+//                 std::cout << line << std::endl;
+                 QStringList list = QString(line.c_str()).split(" ");
+                 QStringList par = list[1].split(",");
+                 if (list[0] == "Shape"){
+                     float x = par.at(0).toFloat(), y = par.at(1).toFloat(), w = par.at(2).toFloat(), h = par.at(3).toFloat();
+                     int r = par.at(4).toInt(&ok,10), g = par.at(5).toInt(&ok,10), b = par.at(6).toInt(&ok,10);
+                     std::cout << "Shape("<<x<<","<<y<<","<<","<<w<<","<<h<<","<<r<<","<<g<<","<<b<<")"<<std::endl;
+                     Shape* shape = new Shape(x,y,w,h,r,g,b);
+                     cont->add(shape);
+
+                 } else if (list[0] == "Rectangle") {
+                     float x = par.at(0).toFloat(), y = par.at(1).toFloat(), w = par.at(2).toFloat(), h = par.at(3).toFloat();
+                     int r = par.at(4).toInt(&ok,10), g = par.at(5).toInt(&ok,10), b = par.at(6).toInt(&ok,10);
+                     std::cout << "Rectangle(" << x << "," << y << "," << w << "," <<h<<","<<r<<","<<g<<","<<b<<")"<<std::endl;
+                     Shape *rect = new Rectangle(x,y,w,h,r,g,b);
+                     cont->add(rect);
+                 } else if (list[0] == "Circle") {
+                     float x = par.at(0).toFloat(), y = par.at(1).toFloat(), radius = par.at(2).toFloat();
+                     int r = par.at(3).toInt(&ok,10), g = par.at(4).toInt(&ok,10), b = par.at(5).toInt(&ok,10);
+                     std::cout << "Circle("<<x<<","<<y<<","<<radius<<","<<r<<","<<g<<","<<b<<")"<<std::endl;
+                     Shape* circle = new Circle(x,y,radius,r,g,b);
+                     cont->add(circle);
+                 }
+                std::getline(data,line);
+             }
+             shapeContainers.push_back(cont);
+             std::cout << "***" << std::endl;
+         }
+         data.close();
+         if (shapeContainers.size()>0) setCurrentContainer(shapeContainers[0]);
+     }
+}
+
+void MainWindow::saveAs() {
+//    std::cout << "saving file " << std::endl;
+    QFileDialog::Options options;
+    QString selectedFilter;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save to file"),
+                                                    QString(""),
+                                                    tr("All Files (*);;Text Files (*.txt)"),
+                                                    &selectedFilter,
+                                                    options);
+    if (!fileName.isEmpty()) {
+        std::cout << fileName.toStdString() << std::endl;
+        std::ofstream data(fileName.toStdString().c_str(), std::ios_base::out);
+        for (std::vector<ShapeContainer*>::iterator it = shapeContainers.begin();it < shapeContainers.end(); it++){
+            data << (*it)->toString();
+            data << "***" << std::endl;
+        }
+        data.close();
+    }
+}
+
 void MainWindow::setCurrentContainer(ShapeContainer *cont){
     currShapeContainer = cont;
 //    curr_shape_cont->setSelected(true);
-    currShapeContainer->setVisible(true);
+    if (currShapeContainer != NULL) currShapeContainer->setVisible(true);
     for (std::vector<ShapeContainer*>::iterator it=shapeContainers.begin();it<shapeContainers.end();it++)
         if (currShapeContainer != (*it))
             (*it)->setVisible(false);
 }
 
 void MainWindow::mergeShapesWithCurrent(){
+    if (currShapeContainer == NULL) return;
     float x11 = currShapeContainer->getMinX();
     float y11 = currShapeContainer->getMinY();
     float x12 = currShapeContainer->getMaxX();
@@ -54,6 +173,7 @@ void MainWindow::mergeShapesWithCurrent(){
 }
 
 void MainWindow::changeCurrentShapeColorOnIntersection() {
+    if (currShapeContainer == NULL) return;
     float x11 = currShapeContainer->getMinX();
     float y11 = currShapeContainer->getMinY();
     float x12 = currShapeContainer->getMaxX();
@@ -83,13 +203,18 @@ void MainWindow::changeCurrentShapeColorOnIntersection() {
 }
 
 void MainWindow::selectNextContainer(){
-    if (currShapeContainer == shapeContainers.back())
-        setCurrentContainer(shapeContainers.front());
-    else {
-        int shape_size = shapeContainers.size() - 1;
-        for(int i=0; i < shape_size; i++)
-            if (currShapeContainer == shapeContainers[i])
-                setCurrentContainer(shapeContainers[i+1]);
+    if (shapeContainers.size() > 0) {
+        if (currShapeContainer == NULL) {
+            setCurrentContainer(shapeContainers.front());
+        }
+        else if (currShapeContainer == shapeContainers.back())
+            setCurrentContainer(shapeContainers.front());
+        else {
+            int shape_size = shapeContainers.size() - 1;
+            for(int i=0; i < shape_size; i++)
+                if (currShapeContainer == shapeContainers[i])
+                    setCurrentContainer(shapeContainers[i+1]);
+        }
     }
 }
 
@@ -107,13 +232,13 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_W){
-        currShapeContainer->move(0,-10);
+        if (currShapeContainer != NULL)  currShapeContainer->move(0,-10);
     } else if (event->key() == Qt::Key_S) {
-        currShapeContainer->move(0,10);
+        if (currShapeContainer != NULL) currShapeContainer->move(0,10);
     } else if (event->key() == Qt::Key_A) {
-        currShapeContainer->move(-10,0);
+        if (currShapeContainer != NULL) currShapeContainer->move(-10,0);
     } else if (event->key() == Qt::Key_D) {
-        currShapeContainer->move(10,0);
+        if (currShapeContainer != NULL) currShapeContainer->move(10,0);
     } else if (event->key() == Qt::Key_Tab) {
         //selecting next shape container
         this->selectNextContainer();
@@ -137,13 +262,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         //забьем
     } else if (event->key() == Qt::Key_Z) {
         //scaling up
-        currShapeContainer->setScale(2.0);
+        if (currShapeContainer != NULL) currShapeContainer->setScale(2.0);
     } else if (event->key() == Qt::Key_X) {
         //scaling down
-        currShapeContainer->setScale(0.5);
+        if (currShapeContainer != NULL) currShapeContainer->setScale(0.5);
     } else if (event->key() == Qt::Key_M) {
         //merging shapes
-        mergeShapesWithCurrent();
+        if (currShapeContainer != NULL) mergeShapesWithCurrent();
     }
     this->repaint();
 }
